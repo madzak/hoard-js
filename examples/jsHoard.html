@@ -1,0 +1,41 @@
+<html>
+<head>
+	<title>JSHoard - Example</title>
+</head>
+<body>
+	<h1 id="engine"></h1>
+	<form id="hoarding-test" action="" method="get">
+		<label for="valuetoset">Value to Set</label>
+		<input type="text" name="valuetoset" id="value-to-set"/>
+		<input type="submit" value="Hoard"/>
+	</form>
+	<h3>-----------------------------------------------------------------------</h3>
+	<p id="set-value"></p>
+	
+	<script language="javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+	<script language="javascript" src="../lib/storageEngineFactory.js"></script>
+	<script language="javascript" src="../lib/Engines/cookieStorage.js"></script>
+	<script language="javascript" src="../lib/Engines/globalStorage.js"></script>
+	<script language="javascript" src="../lib/Engines/localStorage.js"></script>
+	<script language="javascript" src="../lib/Engines/userDataStorage.js"></script>
+	<script language="javascript" src="../lib/hoard.js"></script>
+	<script language="javascript" src="../lib/objectHoard.js"></script>
+	<script type="text/javascript">
+		var engine = JSHoard.StorageEngineFactory.getEngine('localstorage'),
+			hoarding = new JSHoard.Hoard(engine);
+			
+		$("#engine").html(engine.name);
+		
+		$("#hoarding-test").bind("submit", {hoard: hoarding}, function(evt) {
+			evt.preventDefault();
+			evt.data.hoard.set("test", $("#value-to-set").val());
+			
+			$(document).trigger("onValueChange");
+		});
+		
+		$(document).bind("onValueChange", {hoard: hoarding}, function(evt) {
+			$("#set-value").html(evt.data.hoard.get("test"));
+		});
+	</script>
+</body>
+</html>
