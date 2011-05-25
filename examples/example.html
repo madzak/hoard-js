@@ -12,14 +12,13 @@
 	<h3>-----------------------------------------------------------------------</h3>
 	<p id="set-value"></p>
 	
-	<script language="javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
-	<script language="javascript" src="../lib/storageEngineFactory.js"></script>
-	<script language="javascript" src="../lib/Engines/cookieStorage.js"></script>
-	<script language="javascript" src="../lib/Engines/globalStorage.js"></script>
-	<script language="javascript" src="../lib/Engines/localStorage.js"></script>
-	<script language="javascript" src="../lib/Engines/userDataStorage.js"></script>
-	<script language="javascript" src="../lib/hoard.js"></script>
-	<script language="javascript" src="../lib/objectHoard.js"></script>
+    <script src="http://code.jquery.com/jquery-latest.js"></script>
+    <script src="../lib/hoard.js"></script>
+    <script src="../lib/engines/cookie.js"></script>
+    <script src="../lib/engines/global.js"></script>
+    <script src="../lib/engines/local.js"></script>
+    <script src="../lib/engines/userdata.js"></script>
+    
 	<script type="text/javascript">
 		var engine = JSHoard.StorageEngineFactory.getEngine('localstorage'),
 			hoarding = new JSHoard.Hoard(engine);
