@@ -1,4 +1,33 @@
-module("core");
+module("core", {
+    setup: function() {
+        this.mockStorage = {};
+        (function(self) {
+            MockEngine = function() {
+                this.name = function () {
+                    return "MockEngine";
+                };
+                
+                this.set = function(key, value) {
+                    self.mockStorage[key] = value;
+                };
+                
+                this.remove = function(key){
+                    delete self.mockStorage[key];
+                };
+                
+                this.get = function(key){
+                    return self.mockStorage[key];
+                };
+            };
+            
+            MockEngine.test = function() {
+                return true;
+            };
+            
+            self.mockEngine = MockEngine;
+        })(this);
+    }
+});
 
 test("basic", function() {
     expect(3);
@@ -8,74 +37,51 @@ test("basic", function() {
     ok( JSHoard.Hoard, "JSHoard.Hoard()" );
 });
 
-/* Mocked Engine */
-var mockStorage = {};
-var MockEngine = function() {
-    this.name = function () {
-        return "MockEngine";
-    };
-	
-	this.set = function(key, value) {
-		mockStorage[key] = value;
-	};
-	
-	this.remove = function(key){
-		delete mockStorage[key];
-	};
-	
-	this.get = function(key){
-		return mockStorage[key];
-	};
-};
-MockEngine.test = function() {
-    return true;
-};
-
 /* Core Hoard Object Testing */
 test ("Hoard", function() {
     expect(5);
     
     /* Construction Tests */
-    var emptyHorde = new JSHoard.Hoard();
-    ok(emptyHorde, "Empty Engine Construct");
+    var engine = new this.mockEngine(),
+        emptyObj = new JSHoard.Hoard(),
+        testObj = new JSHoard.Hoard(engine);
     
-    var engine = new MockEngine();
-    var specificHorde = new JSHoard.Hoard(engine);
-    deepEqual(specificHorde.storageEngine, engine, "Constucted with Fake Engine");
+    ok(emptyObj, "Empty Engine Construct");
+    deepEqual(testObj.storageEngine, engine, "Constucted with Fake Engine");
     
     /* Set Tests */
-    specificHorde.set("set_test", "testing a string");
-    equal(mockStorage.set_test, "testing a string", "Engine Set");
+    testObj.set("set_test", "testing a string");
+    equal(this.mockStorage.set_test, "testing a string", "Engine Set");
     
     /* Get tests */
-    mockStorage.get_test = "a test of getting";
-    equal(specificHorde.get("get_test"), mockStorage.get_test, "Engine Get");
+    this.mockStorage.get_test = "a test of getting";
+    equal(testObj.get("get_test"), this.mockStorage.get_test, "Engine Get");
     
     /* Get tests */
-    mockStorage.remove_test = "remove me please";
-    specificHorde.remove("remove_test");
-    ok(!mockStorage.remove_test, "Engine Remove");
+    this.mockStorage.remove_test = "remove me please";
+    testObj.remove("remove_test");
+    ok(!this.mockStorage.remove_test, "Engine Remove");
 });
 
 test ("ObjectHoard", function() {
     expect(3);
     
-    var engine = new MockEngine();
-    var objectHoard = new JSHoard.ObjectHoard("test_obj", engine);
+    var engine = new this.mockEngine(),
+        testObj = new JSHoard.ObjectHoard("test_obj", engine);
     
     /* Set Tests */
-    objectHoard.set("set_test", "testing a string");
-    var parsedObj = JSON.parse(mockStorage.test_obj);
+    testObj.set("set_test", "testing a string");
+    var parsedObj = JSON.parse(this.mockStorage.test_obj);
     equal(parsedObj.set_test, "testing a string", "Engine Set");
     
     /* Get tests */
-    objectHoard.set("get_test", "a test of getting");
-    equal(objectHoard.get("get_test"), "a test of getting", "Engine Get");
+    testObj.set("get_test", "a test of getting");
+    equal(testObj.get("get_test"), "a test of getting", "Engine Get");
     
     /* Get tests */
-    objectHoard.set("remove_test", "remove me please");
-    objectHoard.remove("remove_test");
-    ok(!JSON.parse(mockStorage.test_obj).remove_test, "Engine Remove");
+    testObj.set("remove_test", "remove me please");
+    testObj.remove("remove_test");
+    ok(!JSON.parse(this.mockStorage.test_obj).remove_test, "Engine Remove");
 });
 
 test ("EngineFactory", function() {
@@ -83,14 +89,14 @@ test ("EngineFactory", function() {
     
     var engines = JSHoard.Engines;
     JSHoard.Engines = {
-        mockengine: MockEngine
+        mockengine: this.mockEngine
     };
     
-    var supported_engine = JSHoard.StorageEngineFactory.getSupportedEngine();
-    var engine = JSHoard.StorageEngineFactory.getEngine('mockengine');
+    var supported_engine = JSHoard.StorageEngineFactory.getSupportedEngine(),
+        engine = JSHoard.StorageEngineFactory.getEngine('mockengine');
     
-    deepEqual(supported_engine, new MockEngine(), "Test for supported engines");
-    deepEqual(engine, new MockEngine(), "Ask for a specific engine");
+    deepEqual(supported_engine, new this.mockEngine(), "Test for supported engines");
+    deepEqual(engine, new this.mockEngine(), "Ask for a specific engine");
     
     JSHoard.Engines = engines;
 });
