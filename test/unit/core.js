@@ -32,7 +32,7 @@ MockEngine.test = function() {
 };
 
 /* Core Hoard Object Testing */
-test ("Hoard()", function() {
+test ("Hoard", function() {
     expect(5);
     
     /* Construction Tests */
@@ -57,7 +57,7 @@ test ("Hoard()", function() {
     ok(!mockStorage.remove_test, "Engine Remove");
 });
 
-test ("ObjectHoard()", function() {
+test ("ObjectHoard", function() {
     expect(3);
     
     var engine = new MockEngine();
@@ -76,4 +76,21 @@ test ("ObjectHoard()", function() {
     objectHoard.set("remove_test", "remove me please");
     objectHoard.remove("remove_test");
     ok(!JSON.parse(mockStorage.test_obj).remove_test, "Engine Remove");
+});
+
+test ("EngineFactory", function() {
+    expect(2);
+    
+    var engines = JSHoard.Engines;
+    JSHoard.Engines = {
+        mockengine: MockEngine
+    };
+    
+    var supported_engine = JSHoard.StorageEngineFactory.getSupportedEngine();
+    var engine = JSHoard.StorageEngineFactory.getEngine('mockengine');
+    
+    deepEqual(supported_engine, new MockEngine(), "Test for supported engines");
+    deepEqual(engine, new MockEngine(), "Ask for a specific engine");
+    
+    JSHoard.Engines = engines;
 });
